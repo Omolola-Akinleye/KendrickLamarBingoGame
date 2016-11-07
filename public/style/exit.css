@@ -5,13 +5,10 @@
 	font-family:'Roboto',san-serif;
 }
 
-#exitCont{
+body{
 	background:url('../images/exit.jpg');
 	background-repeat:no-repeat;
 	background-size:cover;
-	width:100%;
-	height:700px;
-	
 }
 
 a{
@@ -20,12 +17,20 @@ a{
 .btn>a{
 	color:#fff94f;
 	}
+.container{
+   background:rgba(255,255,255, .5);
+    padding:50px;
+    margin-top:50px;
+}
+
+.row{
+  padding:20px;
+}
 
 #exitMask{
 	background-color:rgba(255,255,255, 0.5);
 	width:inherit;
-	height:530px;
-	width:70%;
+        padding:20px;
 	margin:0px auto;
 	position:relative;
 	left:0;
@@ -38,7 +43,7 @@ h1{
 	text-align:center;
 	padding:25px;
 	padding-top: 40px;
-	width:50%;
+        color:#fff;
 	margin:auto;
 	border-bottom: 1.5px solid #fff94f;
 	font-style:italic;
@@ -48,87 +53,44 @@ h1{
 	color:black;
 	font-style:italic;
 	padding:10px 0px;
-	
+
 
 }
 
-#ex-social{
-	width:300px;
-	margin:auto;
-	
-}
 
-.last{
-	display:block;
-	position:relative;
-	margin:20px auto;
-	padding:20px;
-	left:0;
-	right:0;
-	top:20px;
-	width:440px;
-	height:50px;
-	
-}
 i{
 	padding:3px;
 }
 
 
-.btn{
+.butn{
 	border:none;
 	outline:none;
-	color:#fff94f;
 	background:#000;
 	font-size:15px;
 	font-weight:600;
+	width:120px;
 	padding:7px;
 	border-radius:3px;
-	width:120px;
-	height:40px;
 	cursor:pointer;
 	letter-spacing: .09em;
-	position: absolute;
-    left: 0;
-    right: 0;
-    margin: auto;
+  margin: auto;
+	display: block;
+	text-align: center;
 	}
+.butn a, .butn a:hover{
+	text-decoration: none;
+	color:#fff94f;
+}
 
-	
-	
+
 .agn{
 	padding:15px;
 	background:rgba(255, 249, 79, .95);
 	border-radius: 5px;
-	width:300px;
-    margin:auto;
-	height:85px;
-}
-
-ul >li{
-	float:left;
-	
-}
-li{
-	font-size:20px;
-	border:2px solid #fff94f;
-    padding:5px;
-	margin-left:10px;
-	border-radius: 50%;
-	width:25px;
-	height:25px;
-	
+	width: 50%;
+  margin:auto;
 }
 
 
-#exitInfo p{
-	width:500px;
-	padding:20px;
-	margin:0px auto;
-	line-height:1.5em;
-	font-weight:500;
-}
-
-#bottom{
-	    clear: both;
 }
