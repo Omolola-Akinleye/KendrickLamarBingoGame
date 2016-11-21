@@ -16,15 +16,27 @@ float: left;
 }
 
 .lingo{
-	  font-family: noize;
+    font-family: noize;
     color: #fff;
     text-align: center;
     letter-spacing: .1em;
     text-shadow: 2px 2px 2px;
 	  padding-top:50px;
+    padding-bottom:30px;
 	  width: 40%;
     margin: auto;
     font-size: 42px;
+}
+
+.mid-group, h2{
+    font-family: noize;
+    color: #fff;
+    text-align: center;
+    width:200px;
+    margin: auto;
+}
+.mid-group>h2 {
+    padding-top:10px;
 }
 
 .track{
@@ -97,9 +109,12 @@ height:300px;
 }
 
  .kdotPlay{
-    margin: 0px auto;
     width: 300px;
+    margin: auto;
+    
  }
+
+
 
 #gmIntro{
 	float:left;
@@ -215,13 +230,15 @@ p{
 	 outline:none;
 	 color:#000;
 	 background:#fff94f;
-	 font-size:15px;
+	 font-size:13px;
 	 font-weight:600;
-	 border-radius:3px;
-	 width:120px;
+	 border-radius:50%;
 	 height:30px;
+     width:30px;
 	 cursor:pointer;
 	 letter-spacing: .07em;
+     top: -25px;
+     position: relative;
  }
  .ibtn:hover{
  	color: #fff94f;
@@ -674,7 +691,9 @@ p#mlyric{
 	overflow-x: scroll;
 	overflow-y: hidden;
 }
-
+#info-block{
+        background-size:100% 90% !important;
+    }
 .song{
 	 width: 90px;
     height: 75px;
@@ -698,4 +717,16 @@ p#mlyric{
   padding:5px;
  }
 
+.icon{
+	width:20px;
+	height: 20px;
+    border:none;
+    border-radius:0%;
+    
+  }
+    
+    .fa-play, .fa-pause, .fa-forward, .fa-backward{
+	font-size:16px;
+    border:none;
+    }
 }
