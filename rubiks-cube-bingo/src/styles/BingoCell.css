@@ -1,0 +1,130 @@
+.bingo-cell {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 1;
+  background-size: cover;
+  background-position: center;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  cursor: pointer;
+  overflow: hidden;
+  transition: transform 0.2s, box-shadow 0.2s, background-color 0.3s;
+}
+
+.bingo-cell:hover:not(.matched) {
+  transform: scale(1.03);
+  box-shadow: 0 0 12px rgba(255, 255, 255, 0.2);
+  z-index: 2;
+}
+
+.cell-overlay {
+  position: absolute;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.65);
+  transition: background 0.3s;
+}
+
+.bingo-cell:hover .cell-overlay {
+  background: rgba(0, 0, 0, 0.45);
+}
+
+.cell-content {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  padding: 3px;
+  text-align: center;
+}
+
+.cell-title {
+  font-size: 0.5rem;
+  font-weight: 700;
+  color: #fff;
+  margin: 0 0 2px;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  line-height: 1.1;
+  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.8);
+}
+
+.cell-lyric {
+  font-size: 0.38rem;
+  color: rgba(255, 255, 255, 0.7);
+  margin: 0;
+  line-height: 1.15;
+  font-style: italic;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.8);
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+/* Matched state */
+.bingo-cell.matched {
+  background-color: #000 !important;
+  background-image: none !important;
+}
+
+.bingo-cell.matched .cell-overlay {
+  background: rgba(0, 0, 0, 0.9);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+}
+
+.bingo-cell.matched .cell-title {
+  color: var(--face-accent, #ffd700);
+}
+
+.bingo-cell.matched .cell-lyric {
+  color: rgba(255, 255, 255, 0.5);
+}
+
+/* Flash states */
+.bingo-cell.correct {
+  animation: correctFlash 0.5s ease-out;
+}
+
+.bingo-cell.wrong {
+  animation: wrongFlash 0.6s ease-out;
+}
+
+@keyframes correctFlash {
+  0% { box-shadow: 0 0 0 0 rgba(0, 255, 100, 0.8); }
+  50% { box-shadow: 0 0 20px 5px rgba(0, 255, 100, 0.6); }
+  100% { box-shadow: none; }
+}
+
+@keyframes wrongFlash {
+  0% { background-color: transparent; }
+  25% { background-color: rgba(255, 0, 0, 0.7); }
+  100% { background-color: transparent; }
+}
+
+/* Free cell */
+.free-cell {
+  background: radial-gradient(circle, #ffd700 0%, #b8860b 100%) !important;
+  cursor: default;
+}
+
+.free-cell .cell-overlay {
+  background: rgba(0, 0, 0, 0.3);
+}
+
+.free-text {
+  position: relative;
+  z-index: 1;
+  font-size: 0.55rem;
+  font-weight: 900;
+  color: #000;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  text-shadow: 0 1px 2px rgba(255, 215, 0, 0.5);
+}
+
+/* Active cell highlight */
+.active-cell:not(.matched) {
+  box-shadow: 0 0 8px 2px rgba(255, 215, 0, 0.5);
+}
