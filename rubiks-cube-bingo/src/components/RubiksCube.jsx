@@ -1,62 +1,139 @@
-import { useState, useRef, useCallback, useEffect } from 'react';
+import { useRef, useState, useCallback, useEffect } from 'react';
+import { Canvas, useFrame, useThree } from '@react-three/fiber';
+import { Html, OrbitControls, RoundedBox, Environment, ContactShadows } from '@react-three/drei';
+import * as THREE from 'three';
 import BingoBoard from './BingoBoard';
 import '../styles/RubiksCube.css';
 
 const FACE_NAMES = ['front', 'back', 'right', 'left', 'top', 'bottom'];
 
-const FACE_ROTATIONS = {
-  front: { x: 0, y: 0 },
-  right: { x: 0, y: -90 },
-  back: { x: 0, y: -180 },
-  left: { x: 0, y: 90 },
-  top: { x: -90, y: 0 },
-  bottom: { x: 90, y: 0 },
-};
+// Target rotations for snapping to each face
+const FACE_TARGETS = [
+  [0, 0, 0],                               // front
+  [0, Math.PI, 0],                          // back
+  [0, -Math.PI / 2, 0],                     // right
+  [0, Math.PI / 2, 0],                      // left
+  [-Math.PI / 2, 0, 0],                     // top
+  [Math.PI / 2, 0, 0],                      // bottom
+];
 
-export default function RubiksCube({ boards, faceThemes, questionSong, onCellSelect, activeFace, onFaceChange }) {
-  const [rotation, setRotation] = useState({ x: -15, y: -30 });
-  const [isDragging, setIsDragging] = useState(false);
-  const [isTransitioning, setIsTransitioning] = useState(false);
-  const lastPos = useRef({ x: 0, y: 0 });
-  const cubeRef = useRef(null);
+// Face positions & rotations for Html overlays on cube
+const FACE_CONFIGS = [
+  { position: [0, 0, 2.51], rotation: [0, 0, 0] },                        // front
+  { position: [0, 0, -2.51], rotation: [0, Math.PI, 0] },                  // back
+  { position: [2.51, 0, 0], rotation: [0, Math.PI / 2, 0] },              // right
+  { position: [-2.51, 0, 0], rotation: [0, -Math.PI / 2, 0] },            // left
+  { position: [0, 2.51, 0], rotation: [-Math.PI / 2, 0, 0] },             // top
+  { position: [0, -2.51, 0], rotation: [Math.PI / 2, 0, 0] },             // bottom
+];
 
-  const handlePointerDown = useCallback((e) => {
-    if (e.target.closest('.bingo-board')) return;
-    setIsDragging(true);
-    lastPos.current = { x: e.clientX, y: e.clientY };
-  }, []);
+// Cube edge glow lines
+function CubeEdges() {
+  return (
+    <lineSegments>
+      <edgesGeometry args={[new THREE.BoxGeometry(5.02, 5.02, 5.02)]} />
+      <lineBasicMaterial color="#ffd700" transparent opacity={0.15} />
+    </lineSegments>
+  );
+}
 
-  const handlePointerMove = useCallback((e) => {
-    if (!isDragging) return;
-    const dx = e.clientX - lastPos.current.x;
-    const dy = e.clientY - lastPos.current.y;
-    setRotation(prev => ({
-      x: prev.x - dy * 0.4,
-      y: prev.y + dx * 0.4,
-    }));
-    lastPos.current = { x: e.clientX, y: e.clientY };
-  }, [isDragging]);
+// The 3D cube mesh with bingo boards on each face
+function Cube({ boards, faceThemes, questionSong, onCellSelect, activeFace, targetRotation, onSnapped }) {
+  const groupRef = useRef();
+  const isAnimating = useRef(false);
 
-  const handlePointerUp = useCallback(() => {
-    setIsDragging(false);
-  }, []);
+  useFrame(() => {
+    if (!groupRef.current || !targetRotation) return;
+
+    const [tx, ty, tz] = targetRotation;
+    const rot = groupRef.current.rotation;
+    const speed = 0.08;
+
+    const dx = tx - rot.x;
+    const dy = ty - rot.y;
+    const dz = tz - rot.z;
+
+    if (Math.abs(dx) > 0.005 || Math.abs(dy) > 0.005 || Math.abs(dz) > 0.005) {
+      rot.x += dx * speed;
+      rot.y += dy * speed;
+      rot.z += dz * speed;
+      isAnimating.current = true;
+    } else if (isAnimating.current) {
+      rot.x = tx;
+      rot.y = ty;
+      rot.z = tz;
+      isAnimating.current = false;
+      if (onSnapped) onSnapped();
+    }
+  });
+
+  return (
+    <group ref={groupRef}>
+      {/* Glass-like cube body */}
+      <RoundedBox args={[5, 5, 5]} radius={0.15} smoothness={4}>
+        <meshPhysicalMaterial
+          color="#111118"
+          metalness={0.3}
+          roughness={0.2}
+          clearcoat={1}
+          clearcoatRoughness={0.1}
+          transparent
+          opacity={0.92}
+          envMapIntensity={0.5}
+        />
+      </RoundedBox>
+
+      <CubeEdges />
+
+      {/* Bingo boards on each face */}
+      {FACE_CONFIGS.map((config, i) => (
+        <group key={i} position={config.position} rotation={config.rotation}>
+          <Html
+            transform
+            occlude="blending"
+            style={{
+              width: '420px',
+              height: '420px',
+              pointerEvents: 'auto',
+            }}
+            distanceFactor={5.8}
+          >
+            <div className="three-face-wrapper" style={{ background: faceThemes[i].color }}>
+              <BingoBoard
+                board={boards[i]}
+                faceTheme={faceThemes[i]}
+                questionSong={questionSong}
+                onCellSelect={onCellSelect}
+                isActiveFace={activeFace === i}
+              />
+            </div>
+          </Html>
+        </group>
+      ))}
+    </group>
+  );
+}
+
+// Camera controller that works with OrbitControls
+function CameraController({ targetRotation }) {
+  const { camera } = useThree();
 
   useEffect(() => {
-    window.addEventListener('pointermove', handlePointerMove);
-    window.addEventListener('pointerup', handlePointerUp);
-    return () => {
-      window.removeEventListener('pointermove', handlePointerMove);
-      window.removeEventListener('pointerup', handlePointerUp);
-    };
-  }, [handlePointerMove, handlePointerUp]);
+    camera.position.set(0, 2, 10);
+    camera.lookAt(0, 0, 0);
+  }, [camera]);
 
-  const snapToFace = (faceName) => {
-    const target = FACE_ROTATIONS[faceName];
-    setIsTransitioning(true);
-    setRotation(target);
-    onFaceChange(FACE_NAMES.indexOf(faceName));
-    setTimeout(() => setIsTransitioning(false), 600);
-  };
+  return null;
+}
+
+export default function RubiksCube({ boards, faceThemes, questionSong, onCellSelect, activeFace, onFaceChange }) {
+  const [targetRotation, setTargetRotation] = useState(null);
+  const controlsRef = useRef();
+
+  const snapToFace = useCallback((faceIndex) => {
+    setTargetRotation(FACE_TARGETS[faceIndex]);
+    onFaceChange(faceIndex);
+  }, [onFaceChange]);
 
   return (
     <div className="cube-container">
@@ -65,7 +142,7 @@ export default function RubiksCube({ boards, faceThemes, questionSong, onCellSel
           <button
             key={face}
             className={`face-btn ${activeFace === i ? 'active' : ''}`}
-            onClick={() => snapToFace(face)}
+            onClick={() => snapToFace(i)}
             style={{ '--btn-accent': faceThemes[i].accent }}
           >
             <span className="face-btn-icon">{faceThemes[i].icon}</span>
@@ -74,86 +151,62 @@ export default function RubiksCube({ boards, faceThemes, questionSong, onCellSel
         ))}
       </div>
 
-      <div
-        className="cube-scene"
-        onPointerDown={handlePointerDown}
-      >
-        <div
-          ref={cubeRef}
-          className={`cube ${isTransitioning ? 'transitioning' : ''}`}
-          style={{
-            transform: `rotateX(${rotation.x}deg) rotateY(${rotation.y}deg)`,
-          }}
+      <div className="canvas-wrapper">
+        <Canvas
+          camera={{ position: [0, 2, 10], fov: 45 }}
+          gl={{ antialias: true, alpha: true }}
+          dpr={[1, 2]}
         >
-          {/* Front */}
-          <div className="cube-face front" style={{ '--face-bg': faceThemes[0].color }}>
-            <BingoBoard
-              board={boards[0]}
-              faceTheme={faceThemes[0]}
-              questionSong={questionSong}
-              onCellSelect={onCellSelect}
-              isActiveFace={activeFace === 0}
-            />
-          </div>
+          <color attach="background" args={['#0a0a0f']} />
 
-          {/* Back */}
-          <div className="cube-face back" style={{ '--face-bg': faceThemes[1].color }}>
-            <BingoBoard
-              board={boards[1]}
-              faceTheme={faceThemes[1]}
-              questionSong={questionSong}
-              onCellSelect={onCellSelect}
-              isActiveFace={activeFace === 1}
-            />
-          </div>
+          <CameraController targetRotation={targetRotation} />
 
-          {/* Right */}
-          <div className="cube-face right" style={{ '--face-bg': faceThemes[2].color }}>
-            <BingoBoard
-              board={boards[2]}
-              faceTheme={faceThemes[2]}
-              questionSong={questionSong}
-              onCellSelect={onCellSelect}
-              isActiveFace={activeFace === 2}
-            />
-          </div>
+          {/* Lighting */}
+          <ambientLight intensity={0.4} />
+          <directionalLight position={[5, 8, 5]} intensity={1.2} castShadow />
+          <directionalLight position={[-5, 3, -5]} intensity={0.4} color="#ffd700" />
+          <pointLight position={[0, 5, 0]} intensity={0.6} color="#fff" />
+          <pointLight position={[0, -5, 0]} intensity={0.3} color="#ffd700" />
 
-          {/* Left */}
-          <div className="cube-face left" style={{ '--face-bg': faceThemes[3].color }}>
-            <BingoBoard
-              board={boards[3]}
-              faceTheme={faceThemes[3]}
-              questionSong={questionSong}
-              onCellSelect={onCellSelect}
-              isActiveFace={activeFace === 3}
-            />
-          </div>
+          {/* Environment for reflections */}
+          <Environment preset="city" />
 
-          {/* Top */}
-          <div className="cube-face top" style={{ '--face-bg': faceThemes[4].color }}>
-            <BingoBoard
-              board={boards[4]}
-              faceTheme={faceThemes[4]}
-              questionSong={questionSong}
-              onCellSelect={onCellSelect}
-              isActiveFace={activeFace === 4}
-            />
-          </div>
+          {/* The cube */}
+          <Cube
+            boards={boards}
+            faceThemes={faceThemes}
+            questionSong={questionSong}
+            onCellSelect={onCellSelect}
+            activeFace={activeFace}
+            targetRotation={targetRotation}
+            onSnapped={() => {}}
+          />
 
-          {/* Bottom */}
-          <div className="cube-face bottom" style={{ '--face-bg': faceThemes[5].color }}>
-            <BingoBoard
-              board={boards[5]}
-              faceTheme={faceThemes[5]}
-              questionSong={questionSong}
-              onCellSelect={onCellSelect}
-              isActiveFace={activeFace === 5}
-            />
-          </div>
-        </div>
+          {/* Shadow beneath cube */}
+          <ContactShadows
+            position={[0, -3.5, 0]}
+            opacity={0.4}
+            scale={12}
+            blur={2.5}
+            far={4}
+            color="#ffd700"
+          />
+
+          {/* Orbit controls for drag rotation */}
+          <OrbitControls
+            ref={controlsRef}
+            enablePan={false}
+            enableZoom={true}
+            minDistance={7}
+            maxDistance={18}
+            dampingFactor={0.08}
+            enableDamping
+            rotateSpeed={0.5}
+          />
+        </Canvas>
       </div>
 
-      <p className="drag-hint">Drag to rotate the cube, or click an album above to snap to it</p>
+      <p className="drag-hint">Drag to orbit the cube &middot; Scroll to zoom &middot; Click an album to snap to it</p>
     </div>
   );
 }
