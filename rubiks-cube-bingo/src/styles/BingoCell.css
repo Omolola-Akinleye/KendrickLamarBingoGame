@@ -109,13 +109,18 @@
 }
 
 /* Free cell - transparent to show fire inside the cube */
-.free-cell {
+.bingo-cell.free-cell,
+.bingo-cell.free-cell.matched {
   background: transparent !important;
+  background-color: transparent !important;
+  background-image: none !important;
   cursor: default;
 }
 
-.free-cell .cell-overlay {
-  background: rgba(0, 0, 0, 0.15);
+.free-cell .cell-overlay,
+.bingo-cell.matched.free-cell .cell-overlay {
+  background: rgba(0, 0, 0, 0.1) !important;
+  border: none !important;
 }
 
 .free-text {
