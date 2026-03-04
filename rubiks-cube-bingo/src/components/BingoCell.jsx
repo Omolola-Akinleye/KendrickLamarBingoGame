@@ -31,7 +31,7 @@ export default function BingoCell({ song, isActive, onSelect, questionSong }) {
       className={`bingo-cell ${song.matched ? 'matched' : ''} ${flash || ''} ${isActive ? 'active-cell' : ''}`}
       onClick={handleClick}
       style={{
-        backgroundImage: song.matched ? 'none' : `url(${song.photo})`,
+        backgroundImage: song.matched ? 'none' : `url(${song.gif})`,
       }}
     >
       <div className="cell-overlay" />
