@@ -18,13 +18,14 @@ const FACE_TARGETS = [
 ];
 
 // Face positions & rotations for Html overlays on cube
+// cssFlip corrects text orientation for faces where 3D rotation compounds cause 180° flip
 const FACE_CONFIGS = [
-  { position: [0, 0, 2.51], rotation: [0, 0, 0] },                        // front
-  { position: [0, 0, -2.51], rotation: [0, Math.PI, 0] },                  // back
-  { position: [2.51, 0, 0], rotation: [0, Math.PI / 2, 0] },              // right
-  { position: [-2.51, 0, 0], rotation: [0, -Math.PI / 2, 0] },            // left
-  { position: [0, 2.51, 0], rotation: [-Math.PI / 2, 0, 0] },             // top
-  { position: [0, -2.51, 0], rotation: [Math.PI / 2, 0, 0] },             // bottom
+  { position: [0, 0, 2.51], rotation: [0, 0, 0], cssFlip: false },                        // front
+  { position: [0, 0, -2.51], rotation: [0, Math.PI, 0], cssFlip: false },                  // back
+  { position: [2.51, 0, 0], rotation: [0, Math.PI / 2, 0], cssFlip: false },              // right
+  { position: [-2.51, 0, 0], rotation: [0, -Math.PI / 2, 0], cssFlip: false },            // left
+  { position: [0, 2.51, 0], rotation: [-Math.PI / 2, 0, 0], cssFlip: true },              // top
+  { position: [0, -2.51, 0], rotation: [Math.PI / 2, 0, 0], cssFlip: true },              // bottom
 ];
 
 // Cube edge glow lines
@@ -98,7 +99,10 @@ function Cube({ boards, faceThemes, questionSong, onCellSelect, activeFace, targ
             }}
             distanceFactor={5.8}
           >
-            <div className="three-face-wrapper">
+            <div
+              className="three-face-wrapper"
+              style={config.cssFlip ? { transform: 'rotate(180deg)' } : undefined}
+            >
               <BingoBoard
                 board={boards[i]}
                 faceTheme={faceThemes[i]}
