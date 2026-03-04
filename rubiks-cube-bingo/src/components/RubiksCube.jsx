@@ -1,204 +1,9 @@
-import { useRef, useState, useCallback, useEffect, useMemo } from 'react';
+import { useRef, useState, useCallback, useEffect } from 'react';
 import { Canvas, useFrame, useThree } from '@react-three/fiber';
 import { Html, OrbitControls, RoundedBox, Environment, ContactShadows } from '@react-three/drei';
 import * as THREE from 'three';
 import BingoBoard from './BingoBoard';
 import '../styles/RubiksCube.css';
-
-const PARTICLE_COUNT = 120;
-
-// Fire particle system inside the cube
-function InnerFire() {
-  const pointsRef = useRef();
-  const velocities = useRef([]);
-
-  const [positions, colors, sizes] = useMemo(() => {
-    const pos = new Float32Array(PARTICLE_COUNT * 3);
-    const col = new Float32Array(PARTICLE_COUNT * 3);
-    const siz = new Float32Array(PARTICLE_COUNT);
-    const vels = [];
-
-    for (let i = 0; i < PARTICLE_COUNT; i++) {
-      const i3 = i * 3;
-      // Start particles spread across the bottom half of the cube
-      pos[i3] = (Math.random() - 0.5) * 3;
-      pos[i3 + 1] = (Math.random() - 0.5) * 4 - 0.5;
-      pos[i3 + 2] = (Math.random() - 0.5) * 3;
-
-      // Warm fire colors: mix of orange, red, yellow
-      const t = Math.random();
-      if (t < 0.3) {
-        // Deep red/orange core
-        col[i3] = 1.0;
-        col[i3 + 1] = 0.15 + Math.random() * 0.15;
-        col[i3 + 2] = 0.0;
-      } else if (t < 0.7) {
-        // Orange/amber
-        col[i3] = 1.0;
-        col[i3 + 1] = 0.4 + Math.random() * 0.25;
-        col[i3 + 2] = 0.0;
-      } else {
-        // Hot yellow tips
-        col[i3] = 1.0;
-        col[i3 + 1] = 0.7 + Math.random() * 0.3;
-        col[i3 + 2] = 0.1 + Math.random() * 0.2;
-      }
-
-      siz[i] = 0.08 + Math.random() * 0.15;
-
-      vels.push({
-        x: (Math.random() - 0.5) * 0.01,
-        y: 0.01 + Math.random() * 0.025,
-        z: (Math.random() - 0.5) * 0.01,
-      });
-    }
-
-    velocities.current = vels;
-    return [pos, col, siz];
-  }, []);
-
-  useFrame((_, delta) => {
-    if (!pointsRef.current) return;
-    const pos = pointsRef.current.geometry.attributes.position.array;
-    const siz = pointsRef.current.geometry.attributes.size.array;
-    const vels = velocities.current;
-    const clampedDelta = Math.min(delta, 0.05);
-
-    for (let i = 0; i < PARTICLE_COUNT; i++) {
-      const i3 = i * 3;
-
-      // Flicker: add turbulence
-      pos[i3] += (vels[i].x + (Math.random() - 0.5) * 0.02) * clampedDelta * 60;
-      pos[i3 + 1] += vels[i].y * clampedDelta * 60;
-      pos[i3 + 2] += (vels[i].z + (Math.random() - 0.5) * 0.02) * clampedDelta * 60;
-
-      // Shrink as they rise
-      siz[i] *= (1 - 0.003 * clampedDelta * 60);
-
-      // Reset particle when it rises above cube or gets too small
-      if (pos[i3 + 1] > 2.2 || siz[i] < 0.02) {
-        pos[i3] = (Math.random() - 0.5) * 2.5;
-        pos[i3 + 1] = -2 + Math.random() * 1.5;
-        pos[i3 + 2] = (Math.random() - 0.5) * 2.5;
-        siz[i] = 0.08 + Math.random() * 0.15;
-        vels[i].y = 0.01 + Math.random() * 0.025;
-      }
-    }
-
-    pointsRef.current.geometry.attributes.position.needsUpdate = true;
-    pointsRef.current.geometry.attributes.size.needsUpdate = true;
-  });
-
-  return (
-    <points ref={pointsRef}>
-      <bufferGeometry>
-        <bufferAttribute attach="attributes-position" args={[positions, 3]} />
-        <bufferAttribute attach="attributes-color" args={[colors, 3]} />
-        <bufferAttribute attach="attributes-size" args={[sizes, 1]} />
-      </bufferGeometry>
-      <pointsMaterial
-        vertexColors
-        transparent
-        opacity={0.7}
-        blending={THREE.AdditiveBlending}
-        depthWrite={false}
-        sizeAttenuation
-        size={0.25}
-      />
-    </points>
-  );
-}
-
-const EMBER_COUNT = 60;
-
-// Floating embers/sparks drifting inside the cube
-function FloatingEmbers() {
-  const pointsRef = useRef();
-  const velocities = useRef([]);
-
-  const [positions, colors, sizes] = useMemo(() => {
-    const pos = new Float32Array(EMBER_COUNT * 3);
-    const col = new Float32Array(EMBER_COUNT * 3);
-    const siz = new Float32Array(EMBER_COUNT);
-    const vels = [];
-
-    for (let i = 0; i < EMBER_COUNT; i++) {
-      const i3 = i * 3;
-      pos[i3] = (Math.random() - 0.5) * 4;
-      pos[i3 + 1] = (Math.random() - 0.5) * 4;
-      pos[i3 + 2] = (Math.random() - 0.5) * 4;
-
-      // Bright ember colors: white-hot, gold, pale orange
-      const t = Math.random();
-      if (t < 0.4) {
-        col[i3] = 1.0; col[i3 + 1] = 0.9; col[i3 + 2] = 0.6;
-      } else if (t < 0.7) {
-        col[i3] = 1.0; col[i3 + 1] = 0.7; col[i3 + 2] = 0.2;
-      } else {
-        col[i3] = 1.0; col[i3 + 1] = 1.0; col[i3 + 2] = 0.85;
-      }
-
-      siz[i] = 0.03 + Math.random() * 0.06;
-
-      vels.push({
-        x: (Math.random() - 0.5) * 0.008,
-        y: (Math.random() - 0.5) * 0.008,
-        z: (Math.random() - 0.5) * 0.008,
-      });
-    }
-
-    velocities.current = vels;
-    return [pos, col, siz];
-  }, []);
-
-  useFrame((state, delta) => {
-    if (!pointsRef.current) return;
-    const pos = pointsRef.current.geometry.attributes.position.array;
-    const siz = pointsRef.current.geometry.attributes.size.array;
-    const vels = velocities.current;
-    const clampedDelta = Math.min(delta, 0.05);
-    const time = state.clock.elapsedTime;
-
-    for (let i = 0; i < EMBER_COUNT; i++) {
-      const i3 = i * 3;
-
-      // Gentle drift with sine-wave wobble
-      pos[i3] += (vels[i].x + Math.sin(time * 0.7 + i) * 0.003) * clampedDelta * 60;
-      pos[i3 + 1] += (vels[i].y + Math.cos(time * 0.5 + i * 0.3) * 0.002) * clampedDelta * 60;
-      pos[i3 + 2] += (vels[i].z + Math.sin(time * 0.6 + i * 0.7) * 0.003) * clampedDelta * 60;
-
-      // Twinkle: pulse size
-      siz[i] = (0.03 + Math.random() * 0.04) * (0.6 + 0.4 * Math.sin(time * 3 + i * 2));
-
-      // Bounce off cube walls
-      if (Math.abs(pos[i3]) > 2.2) vels[i].x *= -1;
-      if (Math.abs(pos[i3 + 1]) > 2.2) vels[i].y *= -1;
-      if (Math.abs(pos[i3 + 2]) > 2.2) vels[i].z *= -1;
-    }
-
-    pointsRef.current.geometry.attributes.position.needsUpdate = true;
-    pointsRef.current.geometry.attributes.size.needsUpdate = true;
-  });
-
-  return (
-    <points ref={pointsRef}>
-      <bufferGeometry>
-        <bufferAttribute attach="attributes-position" args={[positions, 3]} />
-        <bufferAttribute attach="attributes-color" args={[colors, 3]} />
-        <bufferAttribute attach="attributes-size" args={[sizes, 1]} />
-      </bufferGeometry>
-      <pointsMaterial
-        vertexColors
-        transparent
-        opacity={0.9}
-        blending={THREE.AdditiveBlending}
-        depthWrite={false}
-        sizeAttenuation
-        size={0.12}
-      />
-    </points>
-  );
-}
 
 const FACE_NAMES = ['front', 'back', 'right', 'left', 'top', 'bottom'];
 
@@ -267,20 +72,16 @@ function Cube({ boards, faceThemes, questionSong, onCellSelect, activeFace, targ
       {/* Glass-like cube body */}
       <RoundedBox args={[5, 5, 5]} radius={0.15} smoothness={4}>
         <meshPhysicalMaterial
-          color="#1a1a2e"
+          color="#111118"
           metalness={0.3}
           roughness={0.2}
           clearcoat={1}
           clearcoatRoughness={0.1}
           transparent
-          opacity={0.45}
+          opacity={0.92}
           envMapIntensity={0.5}
         />
       </RoundedBox>
-
-      {/* Fire particles inside the cube */}
-      <InnerFire />
-      <FloatingEmbers />
 
       <CubeEdges />
 
