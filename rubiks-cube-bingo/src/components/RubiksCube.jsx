@@ -92,13 +92,13 @@ function Cube({ boards, faceThemes, questionSong, onCellSelect, activeFace, targ
             transform
             occlude="blending"
             style={{
-              width: '520px',
-              height: '520px',
+              width: '150px',
+              height: '150px',
               pointerEvents: 'auto',
             }}
             distanceFactor={5.8}
           >
-            <div className="three-face-wrapper" style={{ background: faceThemes[i].color }}>
+            <div className="three-face-wrapper">
               <BingoBoard
                 board={boards[i]}
                 faceTheme={faceThemes[i]}
