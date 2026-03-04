@@ -37,6 +37,7 @@ export default function App() {
   const [questionIndex, setQuestionIndex] = useState(0);
   const [matchMessage, setMatchMessage] = useState(null);
   const [winFace, setWinFace] = useState(null);
+  const [gameKey, setGameKey] = useState(0);
 
   const currentQuestion = questions[questionIndex];
 
@@ -89,6 +90,8 @@ export default function App() {
     setQuestionIndex(0);
     setMatchMessage(null);
     setWinFace(null);
+    setActiveFace(0);
+    setGameKey(k => k + 1);
   }, []);
 
   const handleFaceChange = useCallback((faceIdx) => {
@@ -115,6 +118,7 @@ export default function App() {
           />
 
           <RubiksCube
+            key={gameKey}
             boards={boards}
             faceThemes={cubeFaces}
             questionSong={currentQuestion}
