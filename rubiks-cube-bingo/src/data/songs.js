@@ -74,13 +74,13 @@ function shuffle(array) {
   return arr;
 }
 
-// Generate a bingo board (5x5 = 25 songs, center is free)
+// Generate a bingo board (3x3 = 9 songs, center is free)
 export function generateBoard(faceIndex) {
   const shuffled = shuffle(allSongs);
-  const board = shuffled.slice(0, 25).map((song, i) => ({
+  const board = shuffled.slice(0, 9).map((song, i) => ({
     ...song,
-    matched: i === 12, // center cell is free
-    isFree: i === 12,
+    matched: i === 4, // center cell is free
+    isFree: i === 4,
   }));
   return board;
 }

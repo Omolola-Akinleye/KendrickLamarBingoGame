@@ -7,23 +7,23 @@ import './App.css';
 
 function checkBingo(board) {
   const grid = [];
-  for (let r = 0; r < 5; r++) {
-    grid.push(board.slice(r * 5, r * 5 + 5));
+  for (let r = 0; r < 3; r++) {
+    grid.push(board.slice(r * 3, r * 3 + 3));
   }
 
   // Check rows
-  for (let r = 0; r < 5; r++) {
+  for (let r = 0; r < 3; r++) {
     if (grid[r].every(cell => cell.matched)) return true;
   }
 
   // Check columns
-  for (let c = 0; c < 5; c++) {
+  for (let c = 0; c < 3; c++) {
     if (grid.every(row => row[c].matched)) return true;
   }
 
   // Check diagonals
-  if ([0, 1, 2, 3, 4].every(i => grid[i][i].matched)) return true;
-  if ([0, 1, 2, 3, 4].every(i => grid[i][4 - i].matched)) return true;
+  if ([0, 1, 2].every(i => grid[i][i].matched)) return true;
+  if ([0, 1, 2].every(i => grid[i][2 - i].matched)) return true;
 
   return false;
 }
