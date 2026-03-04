@@ -37,10 +37,19 @@ function CubeEdges() {
   );
 }
 
-// The 3D cube mesh with bingo boards on each face
+// Colored label plane for inactive faces
+function FaceLabel({ theme }) {
+  return (
+    <mesh>
+      <planeGeometry args={[4.8, 4.8]} />
+      <meshBasicMaterial color={theme.accent} transparent opacity={0.15} />
+    </mesh>
+  );
+}
+
+// The 3D cube mesh with bingo board on the active face
 function Cube({ boards, faceThemes, questionSong, onCellSelect, activeFace, targetRotation, onSnapped }) {
   const groupRef = useRef();
-  const cubeRef = useRef();
   const isAnimating = useRef(false);
 
   useFrame(() => {
@@ -68,12 +77,10 @@ function Cube({ boards, faceThemes, questionSong, onCellSelect, activeFace, targ
     }
   });
 
-  const occludeRef = cubeRef;
-
   return (
     <group ref={groupRef}>
       {/* Glass-like cube body */}
-      <RoundedBox ref={cubeRef} args={[5, 5, 5]} radius={0.15} smoothness={4}>
+      <RoundedBox args={[5, 5, 5]} radius={0.15} smoothness={4}>
         <meshPhysicalMaterial
           color="#111118"
           metalness={0.3}
@@ -88,29 +95,32 @@ function Cube({ boards, faceThemes, questionSong, onCellSelect, activeFace, targ
 
       <CubeEdges />
 
-      {/* Bingo boards on each face */}
+      {/* Each face: active gets interactive Html board, others get colored label */}
       {FACE_CONFIGS.map((config, i) => (
         <group key={i} position={config.position} rotation={config.rotation}>
-          <Html
-            transform
-            occlude={[occludeRef]}
-            style={{
-              width: '460px',
-              height: '460px',
-              pointerEvents: 'auto',
-            }}
-            distanceFactor={6}
-          >
-            <div className="three-face-wrapper">
-              <BingoBoard
-                board={boards[i]}
-                faceTheme={faceThemes[i]}
-                questionSong={questionSong}
-                onCellSelect={onCellSelect}
-                isActiveFace={activeFace === i}
-              />
-            </div>
-          </Html>
+          {activeFace === i ? (
+            <Html
+              transform
+              style={{
+                width: '460px',
+                height: '460px',
+                pointerEvents: 'auto',
+              }}
+              distanceFactor={6}
+            >
+              <div className="three-face-wrapper">
+                <BingoBoard
+                  board={boards[i]}
+                  faceTheme={faceThemes[i]}
+                  questionSong={questionSong}
+                  onCellSelect={onCellSelect}
+                  isActiveFace={true}
+                />
+              </div>
+            </Html>
+          ) : (
+            <FaceLabel theme={faceThemes[i]} />
+          )}
         </group>
       ))}
     </group>
