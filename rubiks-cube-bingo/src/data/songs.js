@@ -74,12 +74,35 @@ function shuffle(array) {
   return arr;
 }
 
+// Map a song's album string to a face index (case-insensitive)
+function getFaceForAlbum(album) {
+  const a = album.toLowerCase().replace(/[^a-z0-9]/g, '');
+  if (a.includes('maad') || a.includes('goodkid')) return 0;
+  if (a.includes('butterfly')) return 1;
+  if (a.includes('section80') || a.includes('section 80')) return 2;
+  if (a.includes('damn')) return 3;
+  if (a.includes('untitled')) return 4;
+  return 5; // Features, singles, and everything else
+}
+
 // Generate a bingo board (3x3 = 9 songs, center is free)
+// Songs are filtered by the album matching the face
 export function generateBoard(faceIndex) {
-  const shuffled = shuffle(allSongs);
-  const board = shuffled.slice(0, 9).map((song, i) => ({
+  const faceSongs = allSongs.filter(s => getFaceForAlbum(s.album) === faceIndex);
+  const otherSongs = allSongs.filter(s => getFaceForAlbum(s.album) !== faceIndex);
+
+  const shuffledFace = shuffle(faceSongs);
+  const shuffledOther = shuffle(otherSongs);
+
+  // Pick up to 9 from face album, fill remainder from other albums
+  const picked = shuffledFace.slice(0, 9);
+  if (picked.length < 9) {
+    picked.push(...shuffledOther.slice(0, 9 - picked.length));
+  }
+
+  const board = picked.slice(0, 9).map((song, i) => ({
     ...song,
-    matched: i === 4, // center cell is free
+    matched: i === 4,
     isFree: i === 4,
   }));
   return board;
