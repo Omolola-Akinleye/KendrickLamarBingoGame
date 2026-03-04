@@ -6,50 +6,44 @@
   flex: 1;
 }
 
-/* Face navigation buttons */
+/* Face navigation controls */
 .face-nav {
   display: flex;
-  gap: 8px;
-  flex-wrap: wrap;
+  align-items: center;
+  gap: 16px;
   justify-content: center;
   padding: 10px 0;
 }
 
-.face-btn {
+.face-arrow-btn {
   display: flex;
   align-items: center;
-  gap: 5px;
-  padding: 8px 14px;
-  background: rgba(255, 255, 255, 0.05);
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  border-radius: 8px;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  border-radius: 50%;
   color: #fff;
   cursor: pointer;
-  font-size: 0.75rem;
-  font-weight: 600;
-  transition: all 0.3s;
+  font-size: 1.1rem;
+  transition: all 0.2s;
   font-family: inherit;
 }
 
-.face-btn:hover {
-  background: rgba(255, 255, 255, 0.12);
-  border-color: var(--btn-accent);
-  transform: translateY(-2px);
+.face-arrow-btn:hover {
+  background: rgba(255, 255, 255, 0.18);
+  border-color: rgba(255, 215, 0, 0.5);
+  transform: scale(1.1);
 }
 
-.face-btn.active {
-  background: var(--btn-accent);
-  color: #000;
-  border-color: var(--btn-accent);
-  box-shadow: 0 0 15px color-mix(in srgb, var(--btn-accent) 40%, transparent);
-}
-
-.face-btn-icon {
-  font-size: 1rem;
-}
-
-.face-btn-label {
-  white-space: nowrap;
+.face-indicator {
+  font-size: 0.9rem;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  min-width: 160px;
+  text-align: center;
 }
 
 /* Three.js Canvas */
@@ -99,13 +93,9 @@
     height: 500px;
   }
 
-  .face-btn {
-    padding: 6px 10px;
-    font-size: 0.65rem;
-  }
-
-  .face-btn-label {
-    display: none;
+  .face-indicator {
+    font-size: 0.8rem;
+    min-width: 120px;
   }
 }
 

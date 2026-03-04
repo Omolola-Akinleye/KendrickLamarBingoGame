@@ -138,17 +138,21 @@ export default function RubiksCube({ boards, faceThemes, questionSong, onCellSel
   return (
     <div className="cube-container">
       <div className="face-nav">
-        {FACE_NAMES.map((face, i) => (
-          <button
-            key={face}
-            className={`face-btn ${activeFace === i ? 'active' : ''}`}
-            onClick={() => snapToFace(i)}
-            style={{ '--btn-accent': faceThemes[i].accent }}
-          >
-            <span className="face-btn-icon">{faceThemes[i].icon}</span>
-            <span className="face-btn-label">{faceThemes[i].name}</span>
-          </button>
-        ))}
+        <button
+          className="face-arrow-btn"
+          onClick={() => snapToFace((activeFace - 1 + 6) % 6)}
+        >
+          &larr;
+        </button>
+        <span className="face-indicator" style={{ color: faceThemes[activeFace].accent }}>
+          {faceThemes[activeFace].icon} {faceThemes[activeFace].name}
+        </span>
+        <button
+          className="face-arrow-btn"
+          onClick={() => snapToFace((activeFace + 1) % 6)}
+        >
+          &rarr;
+        </button>
       </div>
 
       <div className="canvas-wrapper">
