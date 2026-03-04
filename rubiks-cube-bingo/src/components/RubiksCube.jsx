@@ -109,6 +109,97 @@ function InnerFire() {
   );
 }
 
+const EMBER_COUNT = 60;
+
+// Floating embers/sparks drifting inside the cube
+function FloatingEmbers() {
+  const pointsRef = useRef();
+  const velocities = useRef([]);
+
+  const [positions, colors, sizes] = useMemo(() => {
+    const pos = new Float32Array(EMBER_COUNT * 3);
+    const col = new Float32Array(EMBER_COUNT * 3);
+    const siz = new Float32Array(EMBER_COUNT);
+    const vels = [];
+
+    for (let i = 0; i < EMBER_COUNT; i++) {
+      const i3 = i * 3;
+      pos[i3] = (Math.random() - 0.5) * 4;
+      pos[i3 + 1] = (Math.random() - 0.5) * 4;
+      pos[i3 + 2] = (Math.random() - 0.5) * 4;
+
+      // Bright ember colors: white-hot, gold, pale orange
+      const t = Math.random();
+      if (t < 0.4) {
+        col[i3] = 1.0; col[i3 + 1] = 0.9; col[i3 + 2] = 0.6;
+      } else if (t < 0.7) {
+        col[i3] = 1.0; col[i3 + 1] = 0.7; col[i3 + 2] = 0.2;
+      } else {
+        col[i3] = 1.0; col[i3 + 1] = 1.0; col[i3 + 2] = 0.85;
+      }
+
+      siz[i] = 0.03 + Math.random() * 0.06;
+
+      vels.push({
+        x: (Math.random() - 0.5) * 0.008,
+        y: (Math.random() - 0.5) * 0.008,
+        z: (Math.random() - 0.5) * 0.008,
+      });
+    }
+
+    velocities.current = vels;
+    return [pos, col, siz];
+  }, []);
+
+  useFrame((state, delta) => {
+    if (!pointsRef.current) return;
+    const pos = pointsRef.current.geometry.attributes.position.array;
+    const siz = pointsRef.current.geometry.attributes.size.array;
+    const vels = velocities.current;
+    const clampedDelta = Math.min(delta, 0.05);
+    const time = state.clock.elapsedTime;
+
+    for (let i = 0; i < EMBER_COUNT; i++) {
+      const i3 = i * 3;
+
+      // Gentle drift with sine-wave wobble
+      pos[i3] += (vels[i].x + Math.sin(time * 0.7 + i) * 0.003) * clampedDelta * 60;
+      pos[i3 + 1] += (vels[i].y + Math.cos(time * 0.5 + i * 0.3) * 0.002) * clampedDelta * 60;
+      pos[i3 + 2] += (vels[i].z + Math.sin(time * 0.6 + i * 0.7) * 0.003) * clampedDelta * 60;
+
+      // Twinkle: pulse size
+      siz[i] = (0.03 + Math.random() * 0.04) * (0.6 + 0.4 * Math.sin(time * 3 + i * 2));
+
+      // Bounce off cube walls
+      if (Math.abs(pos[i3]) > 2.2) vels[i].x *= -1;
+      if (Math.abs(pos[i3 + 1]) > 2.2) vels[i].y *= -1;
+      if (Math.abs(pos[i3 + 2]) > 2.2) vels[i].z *= -1;
+    }
+
+    pointsRef.current.geometry.attributes.position.needsUpdate = true;
+    pointsRef.current.geometry.attributes.size.needsUpdate = true;
+  });
+
+  return (
+    <points ref={pointsRef}>
+      <bufferGeometry>
+        <bufferAttribute attach="attributes-position" args={[positions, 3]} />
+        <bufferAttribute attach="attributes-color" args={[colors, 3]} />
+        <bufferAttribute attach="attributes-size" args={[sizes, 1]} />
+      </bufferGeometry>
+      <pointsMaterial
+        vertexColors
+        transparent
+        opacity={0.9}
+        blending={THREE.AdditiveBlending}
+        depthWrite={false}
+        sizeAttenuation
+        size={0.12}
+      />
+    </points>
+  );
+}
+
 const FACE_NAMES = ['front', 'back', 'right', 'left', 'top', 'bottom'];
 
 // Target rotations for snapping to each face
@@ -189,6 +280,7 @@ function Cube({ boards, faceThemes, questionSong, onCellSelect, activeFace, targ
 
       {/* Fire particles inside the cube */}
       <InnerFire />
+      <FloatingEmbers />
 
       <CubeEdges />
 
