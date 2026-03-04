@@ -10,10 +10,11 @@
   transition: transform 0.2s, box-shadow 0.2s, background-color 0.3s;
 }
 
-.bingo-cell:hover:not(.matched) {
-  transform: scale(1.03);
-  box-shadow: 0 0 12px rgba(255, 255, 255, 0.2);
+.bingo-cell:hover:not(.matched):not(.free-cell) {
+  transform: scale(1.05);
+  box-shadow: 0 0 18px 4px rgba(255, 215, 0, 0.45), 0 0 6px rgba(255, 255, 255, 0.3);
   z-index: 2;
+  border-color: rgba(255, 215, 0, 0.6);
 }
 
 .cell-overlay {
@@ -23,8 +24,8 @@
   transition: background 0.3s;
 }
 
-.bingo-cell:hover .cell-overlay {
-  background: rgba(0, 0, 0, 0.45);
+.bingo-cell:hover:not(.matched):not(.free-cell) .cell-overlay {
+  background: rgba(0, 0, 0, 0.35);
 }
 
 .cell-content {
@@ -88,7 +89,11 @@
 }
 
 .bingo-cell.wrong {
-  animation: wrongFlash 0.6s ease-out;
+  animation: wrongFlash 0.8s ease-out;
+}
+
+.bingo-cell.wrong .cell-overlay {
+  background: rgba(255, 0, 0, 0.55) !important;
 }
 
 @keyframes correctFlash {
@@ -98,9 +103,9 @@
 }
 
 @keyframes wrongFlash {
-  0% { background-color: transparent; }
-  25% { background-color: rgba(255, 0, 0, 0.7); }
-  100% { background-color: transparent; }
+  0% { border-color: rgba(255, 0, 0, 0.9); box-shadow: 0 0 0 0 rgba(255, 0, 0, 0.6); }
+  30% { border-color: rgba(255, 0, 0, 0.9); box-shadow: 0 0 20px 6px rgba(255, 0, 0, 0.5); }
+  100% { border-color: rgba(255, 255, 255, 0.08); box-shadow: none; }
 }
 
 /* Free cell */

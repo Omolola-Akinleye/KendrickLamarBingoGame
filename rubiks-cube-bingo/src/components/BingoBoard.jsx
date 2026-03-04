@@ -15,7 +15,7 @@ export default function BingoBoard({ board, faceTheme, questionSong, onCellSelec
             song={song}
             isActive={questionSong && song.mlyric === questionSong.mlyric}
             onSelect={onCellSelect}
-            questionSong={isActiveFace ? questionSong : null}
+            questionSong={questionSong}
           />
         ))}
       </div>

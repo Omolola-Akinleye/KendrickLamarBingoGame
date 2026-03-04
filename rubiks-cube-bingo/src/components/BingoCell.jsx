@@ -21,7 +21,7 @@ export default function BingoCell({ song, isActive, onSelect, questionSong }) {
       onSelect(song, true);
     } else {
       setFlash('wrong');
-      setTimeout(() => setFlash(null), 600);
+      setTimeout(() => setFlash(null), 800);
       onSelect(song, false);
     }
   };
