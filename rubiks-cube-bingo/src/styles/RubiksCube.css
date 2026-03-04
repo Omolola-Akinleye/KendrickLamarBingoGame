@@ -72,8 +72,8 @@
 
 /* Bingo board wrapper rendered on cube faces via Html */
 .three-face-wrapper {
-  width: 500px;
-  height: 500px;
+  width: 460px;
+  height: 460px;
   border-radius: 4px;
   overflow: hidden;
   background: transparent;
@@ -95,8 +95,8 @@
   }
 
   .three-face-wrapper {
-    width: 500px;
-    height: 500px;
+    width: 460px;
+    height: 460px;
   }
 
   .face-btn {
@@ -116,7 +116,7 @@
   }
 
   .three-face-wrapper {
-    width: 500px;
-    height: 500px;
+    width: 460px;
+    height: 460px;
   }
 }
