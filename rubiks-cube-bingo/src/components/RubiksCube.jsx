@@ -267,13 +267,13 @@ function Cube({ boards, faceThemes, questionSong, onCellSelect, activeFace, targ
       {/* Glass-like cube body */}
       <RoundedBox args={[5, 5, 5]} radius={0.15} smoothness={4}>
         <meshPhysicalMaterial
-          color="#111118"
+          color="#1a1a2e"
           metalness={0.3}
           roughness={0.2}
           clearcoat={1}
           clearcoatRoughness={0.1}
           transparent
-          opacity={0.92}
+          opacity={0.45}
           envMapIntensity={0.5}
         />
       </RoundedBox>
