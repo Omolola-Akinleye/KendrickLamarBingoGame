@@ -92,8 +92,8 @@ function Cube({ boards, faceThemes, questionSong, onCellSelect, activeFace, targ
             transform
             occlude="blending"
             style={{
-              width: '150px',
-              height: '150px',
+              width: '500px',
+              height: '500px',
               pointerEvents: 'auto',
             }}
             distanceFactor={5.8}
