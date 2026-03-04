@@ -4,10 +4,6 @@ import '../styles/BingoBoard.css';
 export default function BingoBoard({ board, faceTheme, questionSong, onCellSelect, isActiveFace }) {
   return (
     <div className="bingo-board" style={{ '--face-accent': faceTheme.accent }}>
-      <div className="board-header">
-        <span className="board-icon">{faceTheme.icon}</span>
-        <h3 className="board-title">{faceTheme.name}</h3>
-      </div>
       <div className="board-grid">
         {board.map((song, i) => (
           <BingoCell
