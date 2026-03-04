@@ -61,12 +61,17 @@ export default function App() {
 
         return newBoards;
       });
+
+      // Auto-advance to next question after a short delay
+      setTimeout(() => {
+        setQuestionIndex(prev => Math.min(prev + 1, questions.length - 1));
+        setMatchMessage(null);
+      }, 1000);
     } else {
       setMatchMessage({ type: 'wrong', text: 'Try Again Homie!' });
+      setTimeout(() => setMatchMessage(null), 1500);
     }
-
-    setTimeout(() => setMatchMessage(null), 1500);
-  }, []);
+  }, [questions.length]);
 
   const handleNext = useCallback(() => {
     setQuestionIndex(prev => Math.min(prev + 1, questions.length - 1));
