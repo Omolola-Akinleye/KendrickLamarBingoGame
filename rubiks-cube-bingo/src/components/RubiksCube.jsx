@@ -40,7 +40,6 @@ function CubeEdges() {
 // The 3D cube mesh with bingo boards on each face
 function Cube({ boards, faceThemes, questionSong, onCellSelect, activeFace, targetRotation, onSnapped }) {
   const groupRef = useRef();
-  const cubeRef = useRef();
   const isAnimating = useRef(false);
 
   useFrame(() => {
@@ -68,12 +67,10 @@ function Cube({ boards, faceThemes, questionSong, onCellSelect, activeFace, targ
     }
   });
 
-  const occludeRef = cubeRef;
-
   return (
     <group ref={groupRef}>
       {/* Glass-like cube body */}
-      <RoundedBox ref={cubeRef} args={[5, 5, 5]} radius={0.15} smoothness={4}>
+      <RoundedBox args={[5, 5, 5]} radius={0.15} smoothness={4}>
         <meshPhysicalMaterial
           color="#111118"
           metalness={0.3}
@@ -93,13 +90,13 @@ function Cube({ boards, faceThemes, questionSong, onCellSelect, activeFace, targ
         <group key={i} position={config.position} rotation={config.rotation}>
           <Html
             transform
-            occlude={[occludeRef]}
+            occlude="blending"
             style={{
-              width: '460px',
-              height: '460px',
+              width: '500px',
+              height: '500px',
               pointerEvents: 'auto',
             }}
-            distanceFactor={6}
+            distanceFactor={5.8}
           >
             <div className="three-face-wrapper">
               <BingoBoard
